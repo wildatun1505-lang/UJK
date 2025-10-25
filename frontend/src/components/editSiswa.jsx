@@ -26,7 +26,24 @@ const EditSiswa = () => {
       const response = await axios.get(`http://localhost:8000/siswa/${id}`)
       setNama(response.data.nama)
       setAlamat(response.data.alamat)
-      setTanggal(response.data.tanggal_lahir)
+
+      // ✅ Format tanggal agar cocok dengan input type="date"
+      let tanggal = response.data.tanggal_lahir
+      if (tanggal) {
+        // Jika format dd/mm/yyyy → ubah ke yyyy-mm-dd
+        if (tanggal.includes('/')) {
+          const [d, m, y] = tanggal.split('/')
+          tanggal = `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`
+        } else {
+          // Jika format lain (misal ISO atau timestamp)
+          const tgl = new Date(tanggal)
+          if (!isNaN(tgl)) {
+            tanggal = tgl.toISOString().split('T')[0]
+          }
+        }
+      }
+      setTanggal(tanggal)
+
       setJurusan(response.data.jurusan)
     }
     getSiswaById()
